@@ -20,7 +20,7 @@ __global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, long ttl_t
     if(index >= ttl_threads) return; // no computation needed in this one
     
     int stride = blockDim.x * gridDim.x;
-    double loc_acum=0, fxd, x;
+    double loc_acum=0, fdx, x;
     
     for (long i = index; i < cantidadIntervalos; i+=stride) {
         x = (i+0.5)*baseIntervalo;
@@ -37,6 +37,8 @@ int main() {
 
     int size = ttl_threads * sizeof(double);
     double* h_tmp_storage = (double*)malloc(size), d_tmp_storage;
+    cudaMalloc((void**)&d_tmp_storage, size);
+    
     memset(h_tmp_storage, 0.0, size);
     cudaMemcpy(d_tmp_storage, h_tmp_storage, size, cudaMemcpyHostToDevice);
 
