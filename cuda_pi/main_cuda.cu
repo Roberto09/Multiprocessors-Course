@@ -8,7 +8,6 @@ double baseIntervalo = 1.0 / cantidadIntervalos;
 
 __global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, long ttl_threads, double baseIntervalo){
     int index = blockIdx.x * blockDim.x + threadIdx.x;
-    if(index >= ttl_threads) return; // no computation needed in this one
     
     int stride = blockDim.x * gridDim.x;
     double loc_acum=0, fdx, x;
