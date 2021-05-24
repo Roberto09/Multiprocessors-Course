@@ -1,12 +1,12 @@
 #include <stdio.h>
 
 long cantidadIntervalos = 1000000000;
-long ttl_threads = 256*16;
+long wanted_threads = 256*16;
 int blockSize = 256;
 
 double baseIntervalo = 1.0 / cantidadIntervalos;
 
-__global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, long ttl_threads, double baseIntervalo){
+__global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, double baseIntervalo){
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     
     int stride = blockDim.x * gridDim.x;
@@ -24,6 +24,9 @@ __global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, long ttl_t
 
 int main() {
 
+    int numberBlocks = (wanted_threads + blockSize - 1) / blockSize;
+    int ttl_threads = numberBlocks * blockSize;
+
     int size = ttl_threads * sizeof(double);
     double* h_tmp_storage = (double*)malloc(size);
     double* d_tmp_storage;
@@ -32,8 +35,7 @@ int main() {
     memset(h_tmp_storage, 0.0, size);
     cudaMemcpy(d_tmp_storage, h_tmp_storage, size, cudaMemcpyHostToDevice);
 
-    int numberBlocks = (ttl_threads + blockSize - 1) / blockSize;
-    calc_pi <<<numberBlocks, blockSize>>> (d_tmp_storage, cantidadIntervalos, ttl_threads, baseIntervalo);
+    calc_pi <<<numberBlocks, blockSize>>> (d_tmp_storage, cantidadIntervalos, baseIntervalo);
     
 	cudaDeviceSynchronize();
 
