@@ -38,16 +38,16 @@ int main() {
     int size = ttl_threads * sizeof(double);
     double* h_tmp_storage = (double*)malloc(size), d_tmp_storage;
     cudaMalloc((void**)&d_tmp_storage, size);
-    
+
     memset(h_tmp_storage, 0.0, size);
     cudaMemcpy(d_tmp_storage, h_tmp_storage, size, cudaMemcpyHostToDevice);
 
     int numberBlocks = (ttl_threads + blockSize - 1) / blockSize;
-    calc_pi << <numberBlocks, blockSize> >> (d_tmp_storage, cantidadIntervalos, ttl_threads);
+    calc_pi << <numberBlocks, blockSize> >> (d_tmp_storage, cantidadIntervalos, ttl_threads, baseIntervalo);
     
 	cudaDeviceSynchronize();
 
-    cudaMemcpy(h_tmp_storage, d_tmp_storage, size, cudaMemcpyDeviceToHost, baseIntervalo);
+    cudaMemcpy(h_tmp_storage, d_tmp_storage, size, cudaMemcpyDeviceToHost);
     
     double acum = 0;
     for(int i = 0; i < ttl_threads; i++) acum += h_tmp_storage[i];
