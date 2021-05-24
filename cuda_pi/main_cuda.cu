@@ -1,7 +1,15 @@
 #include <stdio.h>
+#include <sys/time.h>
+
+long get_millisec(timeval &s, timeval &e){
+    long seconds = e.tv_sec - s.tv_sec; //seconds
+    long useconds = e.tv_usec - s.tv_usec; //milliseconds
+    return ((seconds) * 1000 + useconds/1000.0);
+}
+struct timeval start, eend;
 
 long cantidadIntervalos = 1000000000;
-long wanted_threads = 256*16;
+long wanted_threads = 256*100;
 int blockSize = 256;
 
 double baseIntervalo = 1.0 / cantidadIntervalos;
@@ -44,6 +52,6 @@ int main() {
     double acum = 0;
     for(int i = 0; i < ttl_threads; i++) acum += h_tmp_storage[i];
 
-    printf("Result = %20.18lf\n", acum);
+    printf("Result = %20.18lf (%ld)\n", acum, get_millisec(start, eend));
     return 0;
 }
