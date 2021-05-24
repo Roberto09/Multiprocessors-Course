@@ -13,14 +13,14 @@ int blockSize = 256;
 
 struct timeval start, eend;
 
-double baseIntervalo = 1.0 / cantidadIntervalos;
+float baseIntervalo = 1.0 / cantidadIntervalos;
 
-__global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, long ttl_threads, double baseIntervalo){
+__global__ void calc_pi(float *tmp_storage, long cantidadIntervalos, long ttl_threads, float baseIntervalo){
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     if(index >= ttl_threads) return; // no computation needed in this one
     
     int stride = blockDim.x * gridDim.x;
-    double loc_acum=0, fdx, x;
+    float loc_acum=0, fdx, x;
     
     for (long i = index; i < cantidadIntervalos; i+=stride) {
         x = (i+0.5)*baseIntervalo;
@@ -35,8 +35,9 @@ __global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, long ttl_t
 int main() {
     gettimeofday(&start, NULL);
 
-    int size = ttl_threads * sizeof(double);
-    double* h_tmp_storage = (double*)malloc(size), d_tmp_storage;
+    int size = ttl_threads * sizeof(float);
+    float* h_tmp_storage = (float*)malloc(size);
+    float* d_tmp_storage;
     cudaMalloc((void**)&d_tmp_storage, size);
 
     memset(h_tmp_storage, 0.0, size);
@@ -49,7 +50,7 @@ int main() {
 
     cudaMemcpy(h_tmp_storage, d_tmp_storage, size, cudaMemcpyDeviceToHost);
     
-    double acum = 0;
+    float acum = 0;
     for(int i = 0; i < ttl_threads; i++) acum += h_tmp_storage[i];
 
     gettimeofday(&eend, NULL);
