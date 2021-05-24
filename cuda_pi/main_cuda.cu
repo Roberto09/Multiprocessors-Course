@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 long cantidadIntervalos = 1000000000;
-long ttl_threads = cantidadIntervalos;
+long ttl_threads = 256*16;
 int blockSize = 256;
 
 float baseIntervalo = 1.0 / cantidadIntervalos;
