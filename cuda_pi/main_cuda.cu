@@ -43,6 +43,6 @@ int main() {
     float acum = 0;
     for(int i = 0; i < ttl_threads; i++) acum += h_tmp_storage[i];
 
-    printf("Result = %20.18lf (%ld)\n", acum, get_millisec(start, eend));
+    printf("Result = %20.18lf (%ld)\n", acum);
     return 0;
 }
