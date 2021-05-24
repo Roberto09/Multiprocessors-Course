@@ -8,23 +8,50 @@ long get_millisec(timeval &s, timeval &e){
 }
 
 long cantidadIntervalos = 1000000000;
-double baseIntervalo;
-double fdx;
-double acum = 0;
+long ttl_threads = cantidadIntervalos;
+int blockSize = 256;
+
 struct timeval start, eend;
 
+double baseIntervalo = 1.0 / cantidadIntervalos;
+double fdx;
+
+__global__ void calc_pi(float *tmp_storage){
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    if(index >= ttl_threads) return; // no computation needed in this one
+    
+    int stride = blockDim.x * gridDim.x;
+    double x=0, loc_acum = 0,
+    
+    for (long i = index; i < cantidadIntervalos; i+=stride) {
+        x = (i+0.5)*baseIntervalo;
+        fdx = 4 / (1 + x * x);
+        loc_acum += fdx;
+    }
+    loc_acum *= baseIntervalo;
+    tmp_storage[index] = loc_acum;
+}
+
+
 int main() {
-   double x=0;
-   long i;
-   baseIntervalo = 1.0 / cantidadIntervalos;
-   gettimeofday(&start, NULL);
-   for (i = 0; i < cantidadIntervalos; i++) {
-      x = (i+0.5)*baseIntervalo;
-      fdx = 4 / (1 + x * x);
-      acum += fdx;
-   }
-   acum *= baseIntervalo;
-   gettimeofday(&eend, NULL);
-   printf("Result = %20.18lf (%ld)\n", acum, get_millisec(start, eend));
-   return 0;
+    gettimeofday(&start, NULL);
+
+    int size = ttl_threads * sizeof(double);
+    double* h_tmp_storage = (double*)malloc(size), d_tmp_storage;
+    memset(h_tmp_storage, 0.0, size);
+    cudaMemcpy(d_tmp_storage, h_tmp_storage, size, cudaMemcpyHostToDevice);
+
+    int numberBlocks = (ttl_threads + blockSize - 1) / blockSize;
+    calc_pi << <numberBlocks, blockSize> >> (d_tmp_storage);
+    
+	cudaDeviceSynchronize();
+
+    cudaMemcpy(h_tmp_storage, d_tmp_storage, size, cudaMemcpyDeviceToHost);
+    
+    double acum = 0;
+    for(int i = 0; i < ttl_threads; i++) acum += h_tmp_storage[i];
+
+    gettimeofday(&eend, NULL);
+    printf("Result = %20.18lf (%ld)\n", acum, get_millisec(start, eend));
+    return 0;
 }
