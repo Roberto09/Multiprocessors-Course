@@ -15,7 +15,7 @@ struct timeval start, eend;
 
 double baseIntervalo = 1.0 / cantidadIntervalos;
 
-__global__ void calc_pi(double *tmp_storage, int cantidadIntervalos, int ttl_threads){
+__global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, long ttl_threads, double baseIntervalo){
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     if(index >= ttl_threads) return; // no computation needed in this one
     
@@ -45,7 +45,7 @@ int main() {
     
 	cudaDeviceSynchronize();
 
-    cudaMemcpy(h_tmp_storage, d_tmp_storage, size, cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_tmp_storage, d_tmp_storage, size, cudaMemcpyDeviceToHost, baseIntervalo);
     
     double acum = 0;
     for(int i = 0; i < ttl_threads; i++) acum += h_tmp_storage[i];
