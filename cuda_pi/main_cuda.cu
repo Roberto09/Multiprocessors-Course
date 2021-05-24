@@ -31,6 +31,7 @@ __global__ void calc_pi(double *tmp_storage, long cantidadIntervalos, double bas
 
 
 int main() {
+    gettimeofday(&start, NULL);
 
     int numberBlocks = (wanted_threads + blockSize - 1) / blockSize;
     int ttl_threads = numberBlocks * blockSize;
@@ -52,6 +53,7 @@ int main() {
     double acum = 0;
     for(int i = 0; i < ttl_threads; i++) acum += h_tmp_storage[i];
 
+    gettimeofday(&eend, NULL);
     printf("Result = %20.18lf (%ld)\n", acum, get_millisec(start, eend));
     return 0;
 }
