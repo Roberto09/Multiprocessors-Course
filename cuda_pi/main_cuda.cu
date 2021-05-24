@@ -34,7 +34,7 @@ int main() {
     cudaMemcpy(d_tmp_storage, h_tmp_storage, size, cudaMemcpyHostToDevice);
 
     int numberBlocks = (ttl_threads + blockSize - 1) / blockSize;
-    calc_pi << <numberBlocks, blockSize> >> (d_tmp_storage, cantidadIntervalos, ttl_threads, baseIntervalo);
+    calc_pi <<<numberBlocks, blockSize>>> (d_tmp_storage, cantidadIntervalos, ttl_threads, baseIntervalo);
     
 	cudaDeviceSynchronize();
 
