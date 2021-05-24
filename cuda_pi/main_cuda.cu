@@ -14,14 +14,13 @@ int blockSize = 256;
 struct timeval start, eend;
 
 double baseIntervalo = 1.0 / cantidadIntervalos;
-double fdx;
 
-__global__ void calc_pi(float *tmp_storage){
+__global__ void calc_pi(double *tmp_storage, int cantidadIntervalos, int ttl_threads){
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     if(index >= ttl_threads) return; // no computation needed in this one
     
     int stride = blockDim.x * gridDim.x;
-    double x=0, loc_acum = 0,
+    double loc_acum=0, fxd, x;
     
     for (long i = index; i < cantidadIntervalos; i+=stride) {
         x = (i+0.5)*baseIntervalo;
@@ -42,7 +41,7 @@ int main() {
     cudaMemcpy(d_tmp_storage, h_tmp_storage, size, cudaMemcpyHostToDevice);
 
     int numberBlocks = (ttl_threads + blockSize - 1) / blockSize;
-    calc_pi << <numberBlocks, blockSize> >> (d_tmp_storage);
+    calc_pi << <numberBlocks, blockSize> >> (d_tmp_storage, cantidadIntervalos, ttl_threads);
     
 	cudaDeviceSynchronize();
 
