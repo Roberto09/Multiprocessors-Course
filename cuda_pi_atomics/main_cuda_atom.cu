@@ -16,12 +16,12 @@ struct timeval start, eend;
 int threadidx;
 
 // Kernel
-__global__ void pi_calculation(double* pi, int nsteps, double base, int nthreads, int nblocks)
+__global__ void pi_calculation(float* pi, int nsteps, float base, int nthreads, int nblocks)
 {
     int i;
-    double x;
+    float x;
     int idx = blockIdx.x * blockDim.x + threadIdx.x; // Calculate index for each thread
-    double acum = 0;
+    float acum = 0;
     for (i = idx; i < nsteps; i += nthreads * nblocks)
     {
         x = (i + 0.5) * base;
@@ -35,10 +35,11 @@ int main(void)
     gettimeofday(&start, NULL);
     dim3 dimGrid(BLOCKS, 1, 1); // Grid dimensions
     dim3 dimBlock(THREADS, 1, 1); // Block dimensions
-    double base = 1.0 / STEPS; // base size
+    float base = 1.0 / STEPS; // base size
 
     // Launch Kernel
-    double pi = 0;
+    int xd = 4;
+    float pi = 0;
     pi_calculation << <dimGrid, dimBlock >> > (&pi, STEPS, base, THREADS, BLOCKS);
 
     // Sync
