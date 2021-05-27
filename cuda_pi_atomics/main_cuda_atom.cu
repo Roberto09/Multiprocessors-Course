@@ -1,4 +1,4 @@
-// nvcc main_cuda.cu -o main_cuda
+// nvcc main_cuda_atom.cu -o main_cuda_atom
 #include <stdio.h>
 #include <sys/time.h>
 
@@ -38,7 +38,7 @@ int main(void)
     float base = 1.0 / STEPS; // base size
 
     // Launch Kernel
-    float* pi = 0;
+    float* pi;
     cudaMallocManaged(&pi, sizeof(float));
     pi_calculation << <dimGrid, dimBlock >> > (pi, STEPS, base, THREADS, BLOCKS);
 
