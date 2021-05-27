@@ -66,7 +66,7 @@ int main(void)
 
     // Output Results
     gettimeofday(&eend, NULL);
-    printf("Result = %20.18lf (%ld)\n", acum, get_millisec(start, eend));
+    printf("Result = %20.18lf (%ld)\n", pi, get_millisec(start, eend));
 
     return 0;
 }
