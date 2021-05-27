@@ -1,4 +1,13 @@
+// nvcc main_cuda.cu -o main_cuda
 #include <stdio.h>
+#include <sys/time.h>
+
+long get_millisec(timeval &s, timeval &e){
+    long seconds = e.tv_sec - s.tv_sec; //seconds
+    long useconds = e.tv_usec - s.tv_usec; //milliseconds
+    return ((seconds) * 1000 + useconds/1000.0);
+}
+struct timeval start, eend;
 
 #define STEPS 2000000000
 #define BLOCKS 256
@@ -22,6 +31,7 @@ __global__ void pi_calculation(double* sum, int nsteps, double base, int nthread
 
 int main(void)
 {
+    gettimeofday(&start, NULL);
     dim3 dimGrid(BLOCKS, 1, 1); // Grid dimensions
     dim3 dimBlock(THREADS, 1, 1); // Block dimensions
     double* h_sum, * d_sum; // Pointer to host & device arrays
@@ -50,12 +60,13 @@ int main(void)
     // Multiply by base
     pi *= base;
 
-    // Output Results
-    printf("PI = %.10f\n", pi);
-
     // Cleanup
     free(h_sum);
     cudaFree(d_sum);
+
+    // Output Results
+    gettimeofday(&eend, NULL);
+    printf("Result = %20.18lf (%ld)\n", acum, get_millisec(start, eend));
 
     return 0;
 }
