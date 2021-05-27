@@ -1,3 +1,4 @@
+// nvcc main_cuda.cu -o main_cuda
 #include <stdio.h>
 #include <sys/time.h>
 

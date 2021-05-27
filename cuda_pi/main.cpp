@@ -1,3 +1,4 @@
+// g++ main.cpp -o main
 #include <stdio.h>
 #include <sys/time.h>
 
