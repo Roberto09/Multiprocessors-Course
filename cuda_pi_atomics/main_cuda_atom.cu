@@ -38,19 +38,20 @@ int main(void)
     float base = 1.0 / STEPS; // base size
 
     // Launch Kernel
-    int xd = 4;
-    float pi = 0;
-    pi_calculation << <dimGrid, dimBlock >> > (&pi, STEPS, base, THREADS, BLOCKS);
+    float* pi = 0;
+    cudaMallocManaged(&pi, sizeof(float));
+    pi_calculation << <dimGrid, dimBlock >> > (pi, STEPS, base, THREADS, BLOCKS);
 
     // Sync
     cudaDeviceSynchronize();
 
     // Multiply by base
-    pi *= base;
+    *pi = (*pi) * base;
 
     // Output Results
     gettimeofday(&eend, NULL);
-    printf("Result = %20.18lf (%ld)\n", pi, get_millisec(start, eend));
-
+    printf("Result = %20.18lf (%ld)\n", *pi, get_millisec(start, eend));
+    cudaFree(pi);
+    gettimeofday(&eend, NULL);
     return 0;
 }
